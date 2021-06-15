@@ -1,0 +1,165 @@
+version: '3.7'
+
+services:
+  reverse-proxy:
+    image: traefik:v2.4
+    command: --api.insecure=true --providers.docker --log.level=DEBUG
+    ports:
+      - "80:80"
+      - "8081:8080"
+    networks:
+      - auth
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  # frontend:
+  #   image: frontend
+  #   ports:
+  #     - '3000:80'
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+   # labels: 
+      #- "traefik.enable=true"
+     # - "traefik.http.router.frontend.rule=PathPrefix(`/`)"
+     # - "traefik.http.router.frontend.rule=Host(`localhost`)"
+    #  - "traefik.http.services.frontend.loadbalancer.server.port=80"
+    
+  catalog:
+    image: catalog
+    build:
+      context: ./Identity
+      dockerfile: Catalog/Dockerfile
+    ports:
+      - 5000:80
+    networks:
+      - auth
+      - rabbit
+    depends_on:
+      - db
+      - rabbitmq
+    labels:
+      - "traefik.http.routers.catalog.rule=PathPrefix(`/api/Catalog`)"
+      - "traefik.http.services.catalog.loadbalancer.server.port=80"
+
+  basket:
+    image: basket
+    build:
+      context: ./Identity
+      dockerfile: Basket/Dockerfile
+    ports:
+      - "6001:80"
+    networks:
+      - auth
+      - rabbit
+    depends_on:
+      - db
+      - rabbitmq
+    labels:
+      - "traefik.http.routers.basket.rule=PathPrefix(`/api/Basket`)"
+      - "traefik.http.services.basket.loadbalancer.server.port=80"
+      #- "traefik.http.middlewares.forwardauth-address.forwardauth.address=http://identity/api/Identity/secured"
+      #- "traefik.http.middlewares.forwardauth-trust.forwardauth.trustForwardHeader=false"
+      #- "traefik.http.routers.basket.middlewares=forwardauth-address"
+      #- "traefik.http.middlewares.test-auth.forwardauth.authResponseHeaders=email"
+
+
+  ordering:
+
+    image: ordering
+    build:
+      context: ./Identity
+      dockerfile: Ordering/Dockerfile
+    ports:
+      - 7000:80
+    networks:
+      - auth
+      - rabbit
+    depends_on:
+      - db
+      - rabbitmq
+    labels:
+      - "traefik.http.routers.ordering.rule=PathPrefix(`/api/Ordering`)"
+      - "traefik.http.services.ordering.loadbalancer.server.port=80"
+      #- "traefik.http.middlewares.forwardauth-address.forwardauth.address=http://identity/api/Identity/secured"
+      #- "traefik.http.middlewares.forwardauth-trust.forwardauth.trustForwardHeader=false"
+      #- "traefik.http.routers.ordering.middlewares=forwardauth-address"
+     # - "traefik.http.middlewares.test-auth.forwardauth.authResponseHeaders=email"
+
+  identity:
+    image: identity
+    build:
+      context: ./Identity
+      dockerfile: Identity/Dockerfile
+    ports:
+      - 8000:80
+    networks:
+      - auth
+      - rabbit
+    depends_on:
+      - db
+      - rabbitmq
+    labels:
+      - "traefik.http.routers.identity.rule=PathPrefix(`/api/Identity`)"
+      - "traefik.http.services.identity.loadbalancer.server.port=80"
+      #- "traefik.http.routers.auth.rule=PathPrefix(`/api/Identity/secured`)"
+    #  - "traefik.http.middlewares.webshop-auth.forwardauth.address=http://identity/api/Identity/secured"
+     # - "traefik.http.routers.users.middlewares=webshop-auth@docker"
+     # - "traefik.http.middlewares.test-auth.forwardauth.authResponseHeaders=email"
+    
+  # auth:
+  #   image: identity-api
+  #   build: 
+  #     context: ./Identity
+  #     dockerfile: Identity/Dockerfile
+  #   ports:
+  #     - 5001:80
+  #   networks:
+  #     - auth
+  #   labels:
+  #     - "traefik.http.routers.auth.rule=PathPrefix(`/api/Identity`)"
+  #     - "traefik.http.services.auth.loadbalancer.server.port=80"
+  #   depends_on:
+  #     - db
+  
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: example
+    networks:
+      - rabbit
+    volumes:
+      - db-volume:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    networks:
+      - rabbit
+
+  rabbitmq:
+    image: "rabbitmq:3.8.3-management-alpine"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    container_name: rabbitmq
+    hostname: rabbitmq
+    networks:
+      - rabbit
+
+networks:
+  auth:
+  rabbit:
+    driver: bridge
+
+volumes:
+  db-volume:
+    driver: local
+  

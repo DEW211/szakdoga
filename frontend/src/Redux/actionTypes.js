@@ -1,0 +1,10 @@
+export const ADD = "ADD";
+export const SUB = "SUB";
+export const ADD_TO_CART = "ADD_TO_CART";
+export const REMOVE_ITEM_FROM_CART = 'REMOVE_ITEM_FROM_CART';
+export const EMPTY_CART = 'EMPTY_CART';
+export const LOGIN = 'LOGIN';
+export const LOGOUT = 'LOGOUT';
+export const SET_ID = 'SET_ID';
+export const SET_CART = 'SET_CART';
+export const PURGE_CART = 'PURGE_CART'
