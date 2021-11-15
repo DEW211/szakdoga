@@ -127,11 +127,11 @@ const handleNext = async () => {
     }
     case 2:
       //make request to ordering, and get him a new empty cart
-      await fetch("http://localhost/api/Ordering", {
+      await fetch("/api/Ordering", {
         method: 'POST',
         headers: {
           'email': email, //TOKEN
-          'token': token,
+          'Authorization': token,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -140,11 +140,11 @@ const handleNext = async () => {
           price: total
         })
       })
-      let cartOnServer = await fetch("http://localhost/api/Basket", {
+      let cartOnServer = await fetch("/api/Basket", {
                 method: 'POST',
                 headers: {
                     'email': email, //ide majd a token megy
-                    'token': token,
+                    'Authorization': token,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({

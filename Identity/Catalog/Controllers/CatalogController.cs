@@ -22,9 +22,13 @@ namespace Catalog.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IReadOnlyCollection<Product>> List()
+        public ActionResult<object> List([FromQuery] int page)
         {
-            return Ok(repository.List());
+            var count = repository.GetProductCount();
+            Response.Headers.Add("pageCount", count.ToString());
+            IReadOnlyCollection<Product> products = repository.List(page);
+
+            return Ok(new { products, count });
         }
 
         [HttpPost]

@@ -129,8 +129,7 @@ const ProducDetails = (props) => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const result = await (await fetch(`http://localhost/api/Catalog/${id}`)).json();
-            console.log(result);
+            const result = await (await fetch(`/api/Catalog/${id}`)).json();
             setProduct(result)
         }
 

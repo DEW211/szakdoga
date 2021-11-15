@@ -44,7 +44,9 @@ namespace Ordering
                 x.UsingRabbitMq((ctx, config) =>
                 {
                     config.Host("rabbitmq");
+
                 });
+               
                 EndpointConvention.Map<IProductOutOfStockEvent>(
                     new Uri("rabbitmq://rabbitmq:/ordering"));
                 EndpointConvention.Map<IOrderSuccessful>(
@@ -71,7 +73,8 @@ namespace Ordering
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
+            app.UseCors("Policy");
 
             app.UseRouting();
 
@@ -84,7 +87,6 @@ namespace Ordering
 
             });
 
-            app.UseCors("Policy");
 
             app.UseEndpoints(endpoints =>
             {

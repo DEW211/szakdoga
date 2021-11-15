@@ -37,10 +37,9 @@ export default function SignUp() {
 
   const onSubmit = async (data) => {
     //dispatch signup action, not yet implemented
-    console.log(data)
     setSignUpError(false)
     try {
-      const res = await fetch("http://localhost/api/Identity/register", {
+      const res = await fetch("/api/Identity/register", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -48,12 +47,11 @@ export default function SignUp() {
         body: JSON.stringify({ email: data.email, password: data.password })
       })
       const result = await res.json();
-      console.log(result);
     } catch (e) {
       setSignUpError("Account already exists")
     }
     if (!signUpError) {
-      const res = await fetch("http://localhost/api/Identity/login", {
+      const res = await fetch("/api/Identity/login", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -61,7 +59,6 @@ export default function SignUp() {
         body: JSON.stringify({ email: data.email, password: data.password })
       })
       const result = await res.json();
-      console.log(result);
      
       if (result.success)
         dispatchLogin('Bearer '+result.token, data.email);

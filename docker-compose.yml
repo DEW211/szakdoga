@@ -12,19 +12,20 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
-  # frontend:
-  #   image: frontend
-  #   ports:
-  #     - '3000:80'
-  #   build:
-  #     context: ./frontend
-  #     dockerfile: Dockerfile
-   # labels: 
-      #- "traefik.enable=true"
-     # - "traefik.http.router.frontend.rule=PathPrefix(`/`)"
-     # - "traefik.http.router.frontend.rule=Host(`localhost`)"
-    #  - "traefik.http.services.frontend.loadbalancer.server.port=80"
-    
+  frontend:
+    image: frontend
+    ports:
+      - '3000:80'
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    networks:
+      - auth
+      - rabbit
+    labels: 
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=PathPrefix(`/`)"
+
   catalog:
     image: catalog
     build:
@@ -39,8 +40,9 @@ services:
       - db
       - rabbitmq
     labels:
+      - "traefik.enable=true"
       - "traefik.http.routers.catalog.rule=PathPrefix(`/api/Catalog`)"
-      - "traefik.http.services.catalog.loadbalancer.server.port=80"
+      
 
   basket:
     image: basket
@@ -56,22 +58,21 @@ services:
       - db
       - rabbitmq
     labels:
+      - "traefik.enable=true"
       - "traefik.http.routers.basket.rule=PathPrefix(`/api/Basket`)"
-      - "traefik.http.services.basket.loadbalancer.server.port=80"
-      #- "traefik.http.middlewares.forwardauth-address.forwardauth.address=http://identity/api/Identity/secured"
-      #- "traefik.http.middlewares.forwardauth-trust.forwardauth.trustForwardHeader=false"
-      #- "traefik.http.routers.basket.middlewares=forwardauth-address"
-      #- "traefik.http.middlewares.test-auth.forwardauth.authResponseHeaders=email"
+      - "traefik.http.middlewares.basket-auth.forwardauth.address=http://Identity/api/Identity/secured"
+      - "traefik.http.middlewares.basket-auth.forwardauth.authResponseHeaders=email"
+      - "traefik.http.routers.basket.middlewares=basket-auth"
+     
 
 
   ordering:
-
     image: ordering
     build:
       context: ./Identity
       dockerfile: Ordering/Dockerfile
     ports:
-      - 7000:80
+      - 7001:80
     networks:
       - auth
       - rabbit
@@ -79,13 +80,12 @@ services:
       - db
       - rabbitmq
     labels:
+      - "traefik.enable=true"
       - "traefik.http.routers.ordering.rule=PathPrefix(`/api/Ordering`)"
-      - "traefik.http.services.ordering.loadbalancer.server.port=80"
-      #- "traefik.http.middlewares.forwardauth-address.forwardauth.address=http://identity/api/Identity/secured"
-      #- "traefik.http.middlewares.forwardauth-trust.forwardauth.trustForwardHeader=false"
-      #- "traefik.http.routers.ordering.middlewares=forwardauth-address"
-     # - "traefik.http.middlewares.test-auth.forwardauth.authResponseHeaders=email"
-
+      - "traefik.http.middlewares.ordering-auth.forwardauth.address=http://Identity/api/Identity/secured"
+      - "traefik.http.middlewares.ordering-auth.forwardauth.authResponseHeaders=email"
+      - "traefik.http.routers.ordering.middlewares=ordering-auth"
+     
   identity:
     image: identity
     build:
@@ -100,27 +100,11 @@ services:
       - db
       - rabbitmq
     labels:
-      - "traefik.http.routers.identity.rule=PathPrefix(`/api/Identity`)"
-      - "traefik.http.services.identity.loadbalancer.server.port=80"
-      #- "traefik.http.routers.auth.rule=PathPrefix(`/api/Identity/secured`)"
-    #  - "traefik.http.middlewares.webshop-auth.forwardauth.address=http://identity/api/Identity/secured"
-     # - "traefik.http.routers.users.middlewares=webshop-auth@docker"
-     # - "traefik.http.middlewares.test-auth.forwardauth.authResponseHeaders=email"
+      - "traefik.enable=true"
+      - "traefik.http.routers.identity-rule.rule=PathPrefix(`/api/Identity`)"
     
-  # auth:
-  #   image: identity-api
-  #   build: 
-  #     context: ./Identity
-  #     dockerfile: Identity/Dockerfile
-  #   ports:
-  #     - 5001:80
-  #   networks:
-  #     - auth
-  #   labels:
-  #     - "traefik.http.routers.auth.rule=PathPrefix(`/api/Identity`)"
-  #     - "traefik.http.services.auth.loadbalancer.server.port=80"
-  #   depends_on:
-  #     - db
+    
+  
   
   db:
     image: postgres
@@ -138,7 +122,7 @@ services:
     image: adminer
     restart: always
     ports:
-      - 8080:8080
+      - 8090:8080
     depends_on:
       - db
     networks:

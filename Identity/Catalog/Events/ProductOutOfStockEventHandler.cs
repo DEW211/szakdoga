@@ -18,7 +18,6 @@ namespace Catalog.Events
         }
         public Task Consume(ConsumeContext<IProductOutOfStockEvent> context)
         {
-            Console.WriteLine(context.Message.Id);
 
             repository.RemoveProductFromAvailable(context.Message.Id);
 

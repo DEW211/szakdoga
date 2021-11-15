@@ -18,9 +18,14 @@ namespace Catalog.DAL
             db = context;
         }
 
-        public IReadOnlyCollection<Product> List()
+        public int GetProductCount()
         {
-            var list = db.Products.Where(p => p.Available).Select(p => ToModel(p)).ToList();
+            return db.Products.Count();
+        }
+
+        public IReadOnlyCollection<Product> List(int pageNumber = 1)
+        {
+            var list = db.Products.Where(p => p.Available).OrderBy(p => p.Id).Select(p => ToModel(p)).Skip((pageNumber - 1)*8).Take(8).ToList();
             return list;
         }
 

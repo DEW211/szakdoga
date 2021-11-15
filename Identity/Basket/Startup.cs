@@ -46,6 +46,7 @@ namespace Basket
                 x.UsingRabbitMq((ctx, cfg) =>
                 {
                     cfg.Host("rabbitmq");
+                    
                     cfg.ReceiveEndpoint("basket", e =>
                     {
                         e.ConfigureConsumer<OrderSuccessfulEventHandler>(ctx);

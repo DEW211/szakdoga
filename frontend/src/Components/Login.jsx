@@ -41,11 +41,8 @@ export default function Login() {
   const { register, handleSubmit, formState:{errors}, watch } = useForm({ resolver: yupResolver(shcema) });
   const onSubmit = async data => {
     setLoginError(false);
-    console.log(data);
-    console.log(errors);
-    console.log("submit")
     //data object tartalmazza az adatokat a login action végrahajtásához, azokat kell majd a disptch fv-be tenni, redux-thunk here we go
-    const res = await fetch("http://localhost/api/Identity/login",{
+    const res = await fetch("/api/Identity/login",{
       method : 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -53,7 +50,6 @@ export default function Login() {
       body: JSON.stringify({email: data.email, password:data.password})
     })
     const result = await res.json();
-    console.log(result);
     if(!result.success){
       setLoginError(result.errorMsg)
     }
@@ -61,8 +57,8 @@ export default function Login() {
       dispatchLogin('Bearer '+result.token, data.email);
   }
 
-  const dispatchLogin = (token, email) => {
-    dispatch(logInWithCartRequest(token, email));
+  const dispatchLogin = async (token, email) => {
+    await dispatch(logInWithCartRequest(token, email));
   }
 
   const isSignedIn = useSelector(selector);
@@ -83,7 +79,7 @@ export default function Login() {
       <div className={classes.paper}>
 
         <Typography component="h1" variant="h5">
-          Sign inn
+          Sign in
         </Typography>
         <form className={classes.form} onSubmit={handleSubmit(onSubmit)}>
           <TextField

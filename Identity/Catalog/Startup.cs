@@ -71,7 +71,7 @@ namespace Catalog
             {
                 app.UseDeveloperExceptionPage();
             }
-
+            app.UseCors("Policy");
             app.UseRouting();
 
             app.UseAuthorization();
@@ -82,7 +82,7 @@ namespace Catalog
 
             });
 
-            app.UseCors("Policy");
+            
 
             app.UseEndpoints(endpoints =>
             {

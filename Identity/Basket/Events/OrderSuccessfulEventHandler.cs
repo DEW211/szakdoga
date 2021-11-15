@@ -16,7 +16,6 @@ namespace Basket.Events
         }
         public Task Consume(ConsumeContext<IOrderSuccessful> context)
         {
-            Console.WriteLine(context.Message.Id);
 
             //availabla false a kosáron
             repository.RemoveBasketFromActive(context.Message.Id);

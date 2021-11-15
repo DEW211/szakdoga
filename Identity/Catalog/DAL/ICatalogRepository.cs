@@ -8,7 +8,9 @@ namespace Catalog.DAL
 {
     public interface ICatalogRepository
     {
-        IReadOnlyCollection<Product> List();
+        IReadOnlyCollection<Product> List(int pageNumber);
+
+        public int GetProductCount();
 
         int Insert(Product product);
 

@@ -10,4 +10,10 @@ export default makeStyles((theme) => ({
   root: {
     flexGrow: 1,
   },
+  button:{
+    backgroundColor: 'blue'
+  },
+  pager:{
+    marginTop: theme.spacing(1)
+  }
 }));

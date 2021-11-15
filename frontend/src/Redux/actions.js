@@ -22,14 +22,12 @@ export const subWithRequest = (item) => {
             ...item,
             amount: item.amount - 1
         }
-        console.log(cart.id);
-        console.log(item);
         if (isLoggedIn) {
-            fetch('http://localhost/api/Basket', {
+            fetch('/api/Basket', {
                 method: 'PATCH',
                 headers: {
                     'email': login.email, //ide kell majd az email ha be van jelentkezve meg a token
-                    'token': login.token,
+                    'Authorization': login.token,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
@@ -55,14 +53,12 @@ export const addWithRequest = (item) => {
             ...item,
             amount: item.amount + 1
         }
-        console.log(cart.id);
-        console.log(item);
         if (isLoggedIn) {
-            fetch('http://localhost/api/Basket', {
+            fetch('/api/Basket', {
                 method: 'PATCH',
                 headers: {
                     'email': login.email, //ide kell majd az email ha be van jelentkezve meg a token
-                    'token': login.token,
+                    'Authorization': login.token,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
@@ -85,7 +81,6 @@ export const addToCart = (item) => ({
 
 export const addToCartWithRequest = (item) => {
     return (dispatch, getState) => {
-        console.log(item);
         const { cart } = getState();
         const isLoggedIn = getState().login.login;
         const {login} = getState();
@@ -97,13 +92,12 @@ export const addToCartWithRequest = (item) => {
         } else {
             itemToSend.amount = cart.cart[itemInCartIdx].amount + 1;
         }
-        console.log(itemToSend)
         if (isLoggedIn) {
-            fetch('http://localhost/api/Basket', {
+            fetch('/api/Basket', {
                 method: 'PATCH',
                 headers: {
                     'email': login.email, //ide kell majd az email ha be van jelentkezve meg a token
-                    'token': login.token,
+                    'Authorization': login.token,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
@@ -124,7 +118,6 @@ export const removeItemFromCart = (item) => ({
 
 export const removeItemFromCartWithRequest = (item) => {
     return (dispatch, getState) => {
-        console.log(item)
         const { cart } = getState();
         const isLoggedIn = getState().login.login;
         const {login} = getState();
@@ -133,14 +126,12 @@ export const removeItemFromCartWithRequest = (item) => {
             ...item,
             amount: 0
         }
-        console.log(cart.id);
-        console.log(item);
         if (isLoggedIn) {
-            fetch('http://localhost/api/Basket', {
+            fetch('/api/Basket', {
                 method: 'PATCH',
                 headers: {
                     'email': login.email, //ide kell majd az email ha be van jelentkezve meg a token
-                    'token': login.token,
+                    'Authorization': login.token,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
@@ -187,11 +178,11 @@ export const logInWithCartRequest = (token, email) => {
         let cartOnServerIxists = false;
         //const {loginState} = getState();
 
-        let cartOnServer = await fetch("http://localhost/api/Basket", {
+        let cartOnServer = await fetch("/api/Basket", {
                 method: 'GET',
                 headers: {
                     'email': email, //ide kell majd az email ha be van jelentkezve meg a token
-                    'token': token,
+                    'Authorization': token,
                     'Content-Type': 'application/json'
                 }
                 
@@ -202,11 +193,11 @@ export const logInWithCartRequest = (token, email) => {
         
         
          if (cart.cart.length > 0) {
-            const response = await fetch("http://localhost/api/Basket", {
+            const response = await fetch("/api/Basket", {
                 method: 'POST',
                 headers: {
                     'email': email, //ide kell majd az email ha be van jelentkezve meg a token
-                    'token': token,
+                    'Authorization': token,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({

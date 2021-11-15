@@ -1,6 +1,6 @@
 import React from 'react';
 import {useEffect, useState} from 'react'
-import {Grid} from '@material-ui/core';
+import {Grid, Box, Button} from '@material-ui/core';
 import Product from './Product';
 import useStyles from './productsStyles';
 
@@ -10,23 +10,37 @@ const Products = () => {
     //let products = [{ id: 1, name:'Kettle', price: 10},{ id: 2, name:'Bag', price: 12}]
 
     let [products, setProducts] = useState([]);
+    let [page, setPage] = useState(1);
+    const itemsOnPage = 8;
+    let [productCount, setProductCount] = useState(undefined)
+
+    const fetchData = async (page) => {
+        const fetchRes = await fetch(`/api/Catalog?page=${page}`)
+        const result = await fetchRes.json();
+        let formated = result.products.map((p, i) => {
+            return {
+                id:p.id,
+                name:p.name,
+                price:p.price,
+                image:p.imageUrl
+            }
+        });
+        setProductCount(result.count)
+        setProducts(formated);
+    }
+
+    const onBack = async ()=>{
+        setPage(page-1)
+        await fetchData(page - 1)
+    }
+    const onForward = async () =>{
+        setPage(page+1)
+        await fetchData(page+1)
+    }
 
     useEffect(() => {
-        const fetchData = async () => {
-            const result = await (await fetch("http://localhost/api/Catalog")).json();
-            console.log(result);
-            let formated = result.map((p, i) => {
-                return {
-                    id:p.id,
-                    name:p.name,
-                    price:p.price,
-                    image:p.imageUrl
-                }
-            });
-            console.log(formated);
-            setProducts(formated);
-        }
-        fetchData();
+        
+        fetchData(1);
     }, [])
 
 
@@ -40,6 +54,11 @@ const Products = () => {
                  </Grid>
              ))}
              </Grid>
+             <Grid container justify="center" className={classes.pager}>
+                 {(page !== 1) && (<Button onClick={onBack} variant="outlined">{('<')}</Button>)}
+                 <Button>{page}</Button>
+                 {((itemsOnPage * page) < productCount) && (<Button onClick={onForward} variant="outlined">{('>')}</Button>)}
+            </Grid>
         </main>
         
     )
